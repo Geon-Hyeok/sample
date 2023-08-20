@@ -5,14 +5,16 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.grgr.dao.ProductBoardDAO;
+import com.grgr.dto.Criteria;
 import com.grgr.dto.ProductBoardVO;
+import com.grgr.dto.ProductUserDTO;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ProductBoardServiceImpl implements ProductBoardService {
-	
+
 	private final ProductBoardDAO productBoardDAO;
 
 	@Override
@@ -22,8 +24,8 @@ public class ProductBoardServiceImpl implements ProductBoardService {
 	}
 
 	@Override
-	public List<ProductBoardVO> selectList() {
-		return productBoardDAO.getList();
+	public List<ProductBoardVO> selectList(Criteria cri) {
+		return productBoardDAO.getList(cri);
 	}
 
 	@Override
@@ -47,6 +49,16 @@ public class ProductBoardServiceImpl implements ProductBoardService {
 	public void modifyViewCnt(int productId) {
 		productBoardDAO.updateViewCnt(productId);
 
+	}
+
+	@Override
+	public int getTotal(Criteria cri) {
+		return productBoardDAO.getTotal(cri);
+	}
+
+	@Override
+	public ProductUserDTO getBoardUserInfo(int productId) {
+		return productBoardDAO.getBoardUserInfo(productId);
 	}
 
 }

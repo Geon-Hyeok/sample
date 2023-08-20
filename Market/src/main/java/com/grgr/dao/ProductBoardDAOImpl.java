@@ -5,7 +5,10 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
+import com.grgr.dto.Criteria;
 import com.grgr.dto.ProductBoardVO;
+import com.grgr.dto.ProductUserDTO;
+import com.grgr.dto.UserInfoDTO;
 import com.grgr.mapper.ProductBoardMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -21,8 +24,8 @@ public class ProductBoardDAOImpl implements ProductBoardDAO {
 	}
 
 	@Override
-	public List<ProductBoardVO> getList() {
-		return sqlSession.getMapper(ProductBoardMapper.class).getList();
+	public List<ProductBoardVO> getList(Criteria cri) {
+		return sqlSession.getMapper(ProductBoardMapper.class).getList(cri);
 	}
 
 	@Override
@@ -43,6 +46,16 @@ public class ProductBoardDAOImpl implements ProductBoardDAO {
 	@Override
 	public int updateViewCnt(int productId) {
 		return sqlSession.getMapper(ProductBoardMapper.class).updateViewCnt(productId);
+	}
+
+	@Override
+	public int getTotal(Criteria cri) {
+		return sqlSession.getMapper(ProductBoardMapper.class).getTotal(cri);
+	}
+
+	@Override
+	public ProductUserDTO getBoardUserInfo(int productId) {
+		return sqlSession.getMapper(ProductBoardMapper.class).getBoardUserInfo(productId);
 	}
 
 }

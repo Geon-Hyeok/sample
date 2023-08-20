@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.grgr.dto.Criteria;
+import com.grgr.dto.PagerDTO;
 import com.grgr.dto.ProductBoardVO;
 import com.grgr.service.ProductBoardService;
 
@@ -25,10 +27,16 @@ public class ProductBoardController {
 
 	/* 상품 목록 페이지 */
 	@GetMapping("/list")
-	public void productBoardListGet(Model model) {
+	public void productBoardListGet(Model model, Criteria cri) {
 		log.info("상품 목록 페이지 진입");
 
-		model.addAttribute("list", productBoardService.selectList());
+		model.addAttribute("list", productBoardService.selectList(cri));
+
+		int total = productBoardService.getTotal(cri);
+
+		PagerDTO pager = new PagerDTO(cri, total);
+
+		model.addAttribute("pager", pager);
 	}
 
 	/* 상품 조회 */
@@ -36,6 +44,7 @@ public class ProductBoardController {
 	public void productBoardPageGet(int productId, Model model) {
 		log.info("상품 상세 조회 진입");
 		model.addAttribute("pageInfo", productBoardService.selectPage(productId));
+		model.addAttribute("userInfo", productBoardService.getBoardUserInfo(productId));
 	}
 
 	/* 상품 등록 페이지 접속 */

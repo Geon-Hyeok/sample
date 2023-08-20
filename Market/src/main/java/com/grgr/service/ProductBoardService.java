@@ -2,7 +2,9 @@ package com.grgr.service;
 
 import java.util.List;
 
+import com.grgr.dto.Criteria;
 import com.grgr.dto.ProductBoardVO;
+import com.grgr.dto.ProductUserDTO;
 
 public interface ProductBoardService {
 
@@ -10,7 +12,7 @@ public interface ProductBoardService {
 	void add(ProductBoardVO board);
 
 	/* 게시판 목록 */
-	List<ProductBoardVO> selectList();
+	List<ProductBoardVO> selectList(Criteria cri);
 
 	/* 게시판 조회 */
 	ProductBoardVO selectPage(int productId);
@@ -23,4 +25,10 @@ public interface ProductBoardService {
 
 	/* 조회수 증가 */
 	void modifyViewCnt(int productId);
+
+	/* 게시판 총 갯수 */
+	public int getTotal(Criteria cri);
+	
+	/* 게시판 상품 정보와 회원 정보 함께 조회 */
+	ProductUserDTO getBoardUserInfo(int productId);
 }

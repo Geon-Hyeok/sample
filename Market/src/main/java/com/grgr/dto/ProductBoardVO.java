@@ -29,5 +29,7 @@ public class ProductBoardVO {
 	private int productBlindState; // 상품 상태
 
 	private String productImage; // 이미지 파일 이름
+	
+	UserInfoDTO userInfo;
 
 }

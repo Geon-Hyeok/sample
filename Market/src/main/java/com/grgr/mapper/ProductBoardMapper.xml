@@ -3,36 +3,92 @@
 <mapper namespace="com.grgr.mapper.ProductBoardMapper">
 	<!-- 게시판 등록 -->
 	<insert id="insert">
-		insert into PRODUCT_BOARD(
+		<selectKey keyProperty="productId"
+			resultType="java.lang.Integer" order="BEFORE">
+			SELECT PRODUCT_Id_SEQ.NEXTVAL
+			FROM DUAL
+		</selectKey>
+		insert into PRODUCT_BOARD (
+		PRODUCT_Id,
 		PRODUCT_TITLE,
-		PRODUCT_CONTENT, PRODUCT_PRICE, UNO)
-		values (
+		PRODUCT_CONTENT,
+		PRODUCT_PRICE,
+		UNO
+		) values (
+		#{productId},
 		#{productTitle},
 		#{productContent},
-		#{productPrice}, #{uno})
+		#{productPrice},
+		#{uno}
+		)
 	</insert>
 
 	<!-- 게시판 목록 -->
 	<select id="getList" resultType="com.grgr.dto.ProductBoardVO">
-		select * from PRODUCT_BOARD
-		order
-		by PRODUCT_ID asc
-	</select>
+		<![CDATA[
+        
+        select PRODUCT_ID, PRODUCT_TITLE, PRODUCT_CONTENT, UNO, PRODUCT_REGDATE, PRODUCT_UPDATE, PRODUCT_PRICE from(       
+                select /*+INDEX_DESC(PRODUCT_BOARD pk_board) */ rownum  as rn, PRODUCT_ID, PRODUCT_TITLE, PRODUCT_CONTENT, UNO, PRODUCT_REGDATE, PRODUCT_UPDATE, PRODUCT_PRICE                 
+                from PRODUCT_BOARD where rownum <= #{pageNum} * #{amount}
+    ]]>
 
-	<!-- 게시판 목록(페이징 적용) -->
-	<!-- <select id="getListPaging" resultType="com.grgr.model.ProductBoardVO"> 
-		<![CDATA[ select PRODUCTId, PRODUCTTITLE, PRODUCTCONTENT, UNO, COST, PRODUCTREGDATE, 
-		PRODUCTUPDATE from( select rownum as rn, PRODUCTId, PRODUCTTITLE, PRODUCTCONTENT, 
-		UNO, COST, PRODUCTREGDATE, PRODUCTUPDATE from PRODUCTBOARD where rownum <= 
-		#{pageNum} * #{amount} ]]> <if test="keyword != null"> and PRODUCTTITLE like 
-		'%'||#{keyword}||'%' </if> <![CDATA[ ) where rn > (#{pageNum} - 1) * #{amount} 
-		]]> </select> -->
+		<if test="keyword != null">
+			and PRODUCT_TITLE like '%'||#{keyword}||'%'
+		</if>
+    
+    <![CDATA[
+    
+    )                
+        where rn > (#{pageNum} -1) * #{amount}
+          ORDER BY
+        PRODUCT_ID DESC
+         ]]>
+
+
+	</select>
 
 	<!-- 게시글 조회 -->
 	<select id="getPage" resultType="com.grgr.dto.ProductBoardVO">
 		select * from PRODUCT_BOARD
 		where
 		PRODUCT_ID = #{productId}
+	</select>
+
+	<!-- ResultMap을 사용한 코드 -->
+	<resultMap id="productBoardUserInfo"
+		type="com.grgr.dto.ProductBoardVO">
+		<id property="productId" column="PRODUCT_Id" />
+		<result property="productTitle" column="PRODUCT_TITLE" />
+		<result property="productContent" column="PRODUCT_CONTENT" />
+		<result property="productPrice" column="PRODUCT_Price" />
+		<result property="productRegdate" column="PRODUCT_REGDATE" />
+		<association property="userInfo" resultMap="userInfoMap" />
+	</resultMap>
+
+	<resultMap id="userInfoMap" type="com.grgr.dto.UserInfoDTO">
+		<result property="nickName" column="nickname" />
+		<result property="phone" column="phone" />
+		<result property="email" column="email" />
+	</resultMap>
+
+	<select id="getBoardUserInfo"
+		resultType="com.grgr.dto.ProductUserDTO">
+		SELECT
+		pb.PRODUCT_Id,
+		pb.PRODUCT_TITLE,
+		pb.PRODUCT_CONTENT,
+		pb.PRODUCT_Price,
+		pb.PRODUCT_REGDATE,
+		u.nickname,
+		u.phone,
+		u.email
+		FROM
+		PRODUCT_BOARD pb
+		JOIN
+		USERINFO u ON pb.UNO = u.uno
+		WHERE
+		pb.PRODUCT_Id =
+		#{productId}
 	</select>
 
 	<!-- 게시글 수정 -->
