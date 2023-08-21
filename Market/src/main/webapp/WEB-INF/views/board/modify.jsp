@@ -240,18 +240,18 @@
 										style="height: 413px; font-weight: bold; resize: none;">${pageInfo.productContent}</textarea>
 								</div>
 							</div>
-							<div class="col-md-12">
-								<input type="hidden" name="productId"
-									value="${pageInfo.productId}" />
-								<button type="submit" class="btn btn-primary" id="modifyButton">수정</button>
-								<form id="deleteForm" action="/board/delete" method="post">
-									<input type="hidden" name="productId"
-										value="${pageInfo.productId}" />
-									<button type="submit" class="btn btn-danger" id="deleteButton">삭제</button>
-								</form>
-							</div>
 						</div>
 					</form>
+					<div class="col-md-12">
+						<input type="hidden" name="productId"
+							value="${pageInfo.productId}" />
+						<button type="submit" class="btn btn-primary" id="modifyButton">수정</button>
+						<form id="deleteForm" action="/board/delete" method="post">
+							<input type="hidden" name="productId"
+								value="${pageInfo.productId}" />
+							<button type="button" class="btn btn-danger" id="deleteButton">삭제</button>
+						</form>
+					</div>
 				</div>
 
 
@@ -333,15 +333,23 @@
 
 		// 페이지 이동 form(리스트 페이지 이동, 조회 페이지 이동)
 		let mForm = $("#modifyForm"); // 페이지 데이터 수정 from
+		let dForm = $("deleteForm");
 		/* 수정 하기 버튼 */
 		$("#modifyButton").on("click", function(e) {
 			mForm.submit();
 		});
 
-		$("#delete_btn").on("click", function(e) {
-			form.attr("action", "/board/delete");
-			form.attr("method", "post");
-			form.submit();
+		$(document).ready(function() {
+			// 삭제 버튼 클릭 시
+			$("#deleteButton").on("click", function(e) {
+				e.preventDefault(); // 기본 동작 막기
+
+				// 삭제 확인 다이얼로그 표시
+				if (confirm("정말로 삭제하시겠습니까?")) {
+					// 삭제 폼을 서버로 전송
+					$("#deleteForm").submit();
+				}
+			});
 		});
 	</script>
 	<!-- / Owl Carousel -->
