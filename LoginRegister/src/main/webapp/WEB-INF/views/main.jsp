@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Welcome BookMall</title>
+<title>끼리끼리 임시 메인 페이지</title>
 <link rel="stylesheet" href="../css/main.css">
 </head>
 <body>
@@ -23,9 +23,9 @@
 				</div>
 				<div class="login_area">
 					<div class="login_button">
-						<a href="/member/login">로그인</a>
+						<a href="/user/login">로그인</a>
 					</div>
-					<span><a href="/member/join">회원가입</a></span>
+					<span><a href="/user/join">회원가입</a></span>
 				</div>
 				<div class="clearfix"></div>
 			</div>

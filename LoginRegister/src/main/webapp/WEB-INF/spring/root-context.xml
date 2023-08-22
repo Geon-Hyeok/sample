@@ -19,6 +19,26 @@
 		<property name="username" value="scott" />
 		<property name="password" value="tiger" />
 	</bean>
+
+	<!-- google email -->
+	<bean id="mailSender"
+		class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.gmail.com" />
+		<property name="port" value="587" />
+		<property name="username" value="shon5982@gmail.com" />
+		<property name="password" value="pkgiwovxjpieqsci" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.transport.protocol">smtp</prop>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+				<prop key="mail.debug">true</prop>
+				<prop key="mail.smtp.ssl.protocols">TLSv1.2</prop>
+				<prop key="mail.smtp.ssl.trust">smtp.gmail.com</prop>
+			</props>
+		</property>
+	</bean>
+
 	<!-- SqlSessionFactory 관련 클래스(SqlSessionFactoryBean 클래스)를 Spring Bean으로 
 		등록 -->
 	<!-- => 필드에 SqlSession 객체를 생성하기 위한 값(객체)이 저장되도록 값(객체) 주입 - Setter Injection -->

@@ -12,7 +12,7 @@
 		<setting name="jdbcTypeForNull" value="NULL" />
 	</settings>
 	<typeAliases>
-		<package name="com.grgr.model" />
+		<package name="com.grgr.dto" />
 		<!-- 이외에도 별칭 설정 가능 -->
 	</typeAliases>
 </configuration>

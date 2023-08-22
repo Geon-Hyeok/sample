@@ -54,7 +54,7 @@
 		PRODUCT_ID = #{productId}
 	</select>
 
-	<!-- ResultMap을 사용한 코드 -->
+	<!-- 테이블 JOIN을 위한 부가 코드 -->
 	<resultMap id="productBoardUserInfo"
 		type="com.grgr.dto.ProductBoardVO">
 		<id property="productId" column="PRODUCT_Id" />
@@ -70,7 +70,8 @@
 		<result property="phone" column="phone" />
 		<result property="email" column="email" />
 	</resultMap>
-
+	
+	<!-- 조인을 활용한 상품 판매자 정보 -->
 	<select id="getBoardUserInfo"
 		resultType="com.grgr.dto.ProductUserDTO">
 		SELECT
@@ -116,7 +117,7 @@
 		</if>
 	</select>
 
-	<!-- 조회수 올리기 -->
+	<!-- 조회수 올리기 --> <!-- 구현 못함 -->
 	<update id="updateViewCnt">
 		update PRODUCT_BOARD set PRODUCT_VIEW_CNT =
 		PRODUCT_VIEW_CNT + 1 where PRODUCT_ID = #{product_Id}
