@@ -25,9 +25,16 @@ public class UserDAOImpl implements UserDAO {
 		return sqlSession.getMapper(UserMapper.class).idCheck(userId);
 	}
 
+	/* 닉네임 중복 검사 */
 	@Override
 	public int nickNameCheck(String nickName) {
 		return sqlSession.getMapper(UserMapper.class).nickNameCheck(nickName);
+	}
+
+	/* 로그인 */
+	@Override
+	public UserVO userLogin(UserVO user) {
+		return sqlSession.getMapper(UserMapper.class).userLogin(user);
 	}
 
 }

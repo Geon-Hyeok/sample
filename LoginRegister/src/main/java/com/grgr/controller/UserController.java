@@ -3,6 +3,8 @@ package com.grgr.controller;
 import java.util.Random;
 
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +94,7 @@ public class UserController {
 
 	@GetMapping("/emailCheck")
 	@ResponseBody
-	public void emailCheckGET(String email) throws Exception {
+	public String emailCheckGET(String email) throws Exception {
 
 		/* 뷰(view)로부터 넘어온 데이터 확인 */
 		logger.info("이메일 데이터 전송 확인");
@@ -124,12 +126,34 @@ public class UserController {
 			e.printStackTrace();
 		}
 
+		String num = Integer.toString(checkNum);
+		return num;
+
 	}
 
 	/* 로그인 페이지 이동 */
 	@GetMapping("/login")
 	public void loginPageGET() {
 		logger.info("로그인 페이지 진입");
+	}
+
+	/* 로그인 */
+	@PostMapping("/login")
+	public String loginPOST(HttpServletRequest request, UserVO user, RedirectAttributes rttr) throws Exception {
+
+		HttpSession session = request.getSession();
+		user = userService.userLogin(user);
+
+		if (user == null) { // 일치하지 않는 아이디, 비밀번호 입력 경우
+			int result = 0;
+			rttr.addFlashAttribute("result", result);
+			return "redirect:/user/login";
+		}
+
+		session.setAttribute("user", user); // 일치하는 아이디, 비밀번호 경우 (로그인 성공)
+
+		return "redirect:/main";
+
 	}
 
 }

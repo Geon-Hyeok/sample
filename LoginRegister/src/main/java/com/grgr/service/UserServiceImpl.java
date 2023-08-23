@@ -26,8 +26,15 @@ public class UserServiceImpl implements UserService {
 
 	}
 
+	/* 닉네임 중복 검사 */
 	@Override
 	public int nickNameCheck(String nickName) {
 		return userDAO.nickNameCheck(nickName);
+	}
+
+	/* 로그인 */
+	@Override
+	public UserVO userLogin(UserVO user) {
+		return userDAO.userLogin(user);
 	}
 }
