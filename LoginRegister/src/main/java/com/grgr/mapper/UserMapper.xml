@@ -26,6 +26,7 @@
 
 	<!-- 로그인 -->
 	<select id="userLogin" resultType="com.grgr.dto.UserVO">
-		select * from USERINFO where USER_ID = #{userId} and USER_PW = #{userPw}
+		<!-- select * from USERINFO where USER_ID = #{userId} and USER_PW = #{userPw} -->  <!-- 인코딩 적용 x -->
+		select * from USERINFO where USER_ID = #{userId}
 	</select>
 </mapper>

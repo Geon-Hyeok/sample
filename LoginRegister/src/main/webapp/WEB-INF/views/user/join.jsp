@@ -216,7 +216,7 @@
 				<div class="pwck_wrap">
 					<div class="pwck_name">비밀번호 확인</div>
 					<div class="pwck_input_box">
-						<input class="pwck_input" name="userPw">
+						<input class="pwck_input">
 					</div>
 					<span class="final_pwck_ck">비밀번호 확인을 입력해주세요.</span> <span
 						class="pwck_input_re_1">비밀번호가 일치합니다.</span> <span
@@ -276,246 +276,307 @@
 
 		/* 유효성 검사 통과유무 변수 */
 		var idCheck = false; // 아이디
-		var idckCheck = false; // 아이디 중복 검사
 		var pwCheck = false; // 비번
 		var pwckCheck = false; // 비번 확인
 		var pwckcorCheck = false; // 비번 확인 일치 확인
 		var nickNameCheck = false; // 닉네임
 		var nameCheck = false; // 이름
-		var mailCheck = false; // 이메일
-		var mailnumCheck = false; // 이메일 인증번호 확인
+		var emailCheck = false; // 이메일
+		var emailnumCheck = false; // 이메일 인증번호 확인
 
-		$(document).ready(
-				function() {
-					//회원가입 버튼(회원가입 기능 작동)
-					$(".join_button")
-							.click(
+		$(document)
+				.ready(
+						function() {
+
+							//아이디 중복검사
+							$('.id_input').on(
+									"propertychange change keyup paste input",
 									function() {
 
-										/* 입력값 변수 */
-										var id = $('.id_input').val(); // id 입력란
-										var pw = $('.pw_input').val(); // 비밀번호 입력란
-										var pwck = $('.pwck_input').val(); // 비밀번호 확인 입력란
-										var nickName = $('.nickName_input')
-												.val(); // 닉네임 입력란
-										var name = $('.user_input').val(); // 이름 입력란
-										var mail = $('.mail_input').val(); // 이메일 입력란
+										var userId = $('.id_input').val(); // .id_input에 입력되는 값
+										var data = {
+											userId : userId
+										} // '컨트롤에 넘길 데이터 이름' : '데이터(.id_input에 입력되는 값)'
 
-										/* 아이디 유효성 검사 */
-										if (id == "") {
-											$('.final_id_ck').css('display',
-													'block');
-											idCheck = false;
-										} else {
-											$('.final_id_ck').css('display',
-													'none');
-											idCheck = true;
-										}
+										$.ajax({
+											type : "post",
+											url : "/user/userIdChk",
+											data : data,
+											success : function(result) {
+												// 성공 여부
+												if (result != 'fail') {
+													$('.id_input_re_1').css(
+															"display",
+															"inline-block");
+													$('.id_input_re_2').css(
+															"display", "none");
+													idCheck = true;
+												} else {
+													$('.id_input_re_2').css(
+															"display",
+															"inline-block");
+													$('.id_input_re_1').css(
+															"display", "none");
+													idCheck = false;
+												}
+											} // success 종료
+										}); // ajax 종료
+									});// function 종료
 
-										/* 비밀번호 유효성 검사 */
-										if (pw == "") {
-											$('.final_pw.ck').css('display',
-													'block');
-											pwCheck = false;
-										} else {
-											$('.final_pw.ck').css('display',
-													'block');
-											pwCheck = true;
-										}
+							// 닉네임 중복검사
+							$('.nickName_input')
+									.on(
+											"propertychange change keyup paste input",
+											function() {
 
-										/* 비밀번호 확인 유효성 검사 */
-										if (pwck == "") {
-											$('.final_pwck_ck').css('display',
-													'block');
-											pwckCheck = false;
-										} else {
-											$('.final_pwck_ck').css('display',
-													'none');
-											pwckCheck = true;
-										}
+												var nickName = $(
+														'.nickName_input')
+														.val(); // .nickName_input에 입력되는 값
+												var data = {
+													nickName : nickName
+												} // '컨트롤에 넘길 데이터 이름' : '데이터(.nickName_input에 입력되는 값)'
 
-										/* 닉네임 유효성 검사 */
-										if (nickName == "") {
-											$('.final_nickName_ck').css(
+												$
+														.ajax({
+															type : "post",
+															url : "/user/userNickNameChk",
+															data : data,
+															success : function(
+																	result) {
+																// 성공 여부
+																if (result != 'fail') {
+																	$(
+																			'.nickName_input_re_1')
+																			.css(
+																					"display",
+																					"inline-block");
+																	$(
+																			'.nickName_input_re_2')
+																			.css(
+																					"display",
+																					"none");
+																	nickNameCheck = true;
+																} else {
+																	$(
+																			'.nickName_input_re_2')
+																			.css(
+																					"display",
+																					"inline-block");
+																	$(
+																			'.nickName_input_re_1')
+																			.css(
+																					"display",
+																					"none");
+																	nickNameCheck = false;
+																}
+															} // success 종료
+														}); // ajax 종료
+											});// function 종료
+
+							/* 인증번호 이메일 전송 */
+							$(".email_check_button")
+									.click(
+											function() {
+
+												var email = $(".email_input")
+														.val(); // 입력한 이메일
+												var checkBox = $(".email_check_input"); // 인증번호 입력란
+												var boxWrap = $(".email_check_input_box"); // 인증번호 입력란 박스
+												var warnMsg = $(".email_input_box_warn"); // 이메일 입력 경고글
+
+												/* 이메일 형식 유효성 검사 */
+												if (emailFormCheck(email)) {
+													warnMsg
+															.html("이메일이 전송 되었습니다. 이메일을 확인해주세요.");
+													warnMsg.css("display",
+															"inline-block");
+												} else {
+													warnMsg
+															.html("올바르지 못한 이메일 형식입니다.");
+													warnMsg.css("display",
+															"inline-block");
+													return false;
+												}
+
+												$
+														.ajax({
+
+															type : "GET",
+															url : "emailCheck?email="
+																	+ email,
+															success : function(
+																	data) {
+
+																// console.log("data : " + data);
+																checkBox
+																		.attr(
+																				"disabled",
+																				false);
+																boxWrap
+																		.attr(
+																				"id",
+																				"email_check_input_box_true");
+																code = data;
+															}
+
+														});
+											});
+
+							/* 인증번호 비교 */
+							$(".email_check_input")
+									.blur(
+											function() {
+												var inputCode = $(
+														".email_check_input")
+														.val(); // 입력코드    
+												var checkResult = $("#email_check_input_box_warn"); // 비교 결과    
+
+												if (inputCode == code) { // 일치할 경우
+													checkResult
+															.html("인증번호가 일치합니다.");
+													checkResult.attr("class",
+															"correct");
+													emailnumCheck = true; // 일치할 경우
+												} else { // 일치하지 않을 경우
+													checkResult
+															.html("인증번호를 다시 확인해주세요.");
+													checkResult.attr("class",
+															"incorrect");
+													emailnumCheck = false; // 일치하지 않을 경우
+												}
+											});
+
+							/* 비밀번호 확인 일치 유효성 검사 */
+
+							$('.pwck_input').on(
+									"propertychange change keyup paste input",
+									function() {
+
+										var pw = $('.pw_input').val();
+										var pwck = $('.pwck_input').val();
+										$('.final_pwck_ck').css('display',
+												'none');
+
+										if (pw == pwck) {
+											$('.pwck_input_re_1').css(
 													'display', 'block');
-											nickNameCheck = false;
-										} else {
-											$('.final_nickName_ck').css(
+											$('.pwck_input_re_2').css(
 													'display', 'none');
-											nickNameCheck = true;
-										}
-
-										/* 이름 유효성 검사 */
-										if (name == "") {
-											$('.final_name_ck').css('display',
-													'block');
-											nameCheck = false;
+											pwckcorCheck = true;
 										} else {
-											$('.final_name_ck').css('display',
-													'none');
-											nameCheck = true;
+											$('.pwck_input_re_1').css(
+													'display', 'none');
+											$('.pwck_input_re_2').css(
+													'display', 'block');
+											pwckcorCheck = false;
 										}
-
-										/* 이메일 유효성 검사 */
-										if (mail == "") {
-											$('.final_email_ck').css('display',
-													'block');
-											mailCheck = false;
-										} else {
-											$('.final_email_ck').css('display',
-													'none');
-											mailCheck = true;
-										}
-
-										/* 최종 유효성 검사 */
-										if (idCheck && idckCheck && pwCheck
-												&& pwckCheck && nickNameCheck
-												&& pwckcorCheck && nameCheck
-												&& mailCheck && mailnumCheck
-												&& addressCheck) {
-
-											$("#join_form").attr("action",
-													"/user/join");
-											$("#join_form").submit();
-										}
-
-										return false;
-
 									});
-				});
+							//회원가입 버튼(회원가입 기능 작동)
+							$(".join_button")
+									.click(
+											function() {
 
-		//아이디 중복검사
-		$('.id_input').on(
-				"propertychange change keyup paste input",
-				function() {
+												/* 입력값 변수 */
+												var id = $('.id_input').val(); // id 입력란
+												var pw = $('.pw_input').val(); // 비밀번호 입력란
+												var pwck = $('.pwck_input')
+														.val(); // 비밀번호 확인 입력란
+												var nickName = $(
+														'.nickName_input')
+														.val(); // 닉네임 입력란
+												var name = $('.user_input')
+														.val(); // 이름 입력란
+												var email = $('.email_input')
+														.val(); // 이메일 입력란
 
-					var userId = $('.id_input').val(); // .id_input에 입력되는 값
-					var data = {
-						userId : userId
-					} // '컨트롤에 넘길 데이터 이름' : '데이터(.id_input에 입력되는 값)'
+												/* 아이디 유효성 검사 */
+												if (id == "") {
+													$('.final_id_ck').css(
+															'display', 'block');
+													idCheck = false;
+												} else {
+													$('.final_id_ck').css(
+															'display', 'none');
+													idCheck = true;
+												}
 
-					$.ajax({
-						type : "post",
-						url : "/user/userIdChk",
-						data : data,
-						success : function(result) {
-							// 성공 여부
-							if (result != 'fail') {
-								$('.id_input_re_1').css("display",
-										"inline-block");
-								$('.id_input_re_2').css("display", "none");
-								idCheck = true;
-							} else {
-								$('.id_input_re_2').css("display",
-										"inline-block");
-								$('.id_input_re_1').css("display", "none");
-								idCheck = false;
-							}
-						} // success 종료
-					}); // ajax 종료
-				});// function 종료
+												/* 비밀번호 유효성 검사 */
+												if (pw == "") {
+													$('.final_pw.ck').css(
+															'display', 'block');
+													pwCheck = false;
+												} else {
+													$('.final_pw.ck').css(
+															'display', 'block');
+													pwCheck = true;
+												}
 
-		// 닉네임 중복검사
-		$('.nickName_input').on(
-				"propertychange change keyup paste input",
-				function() {
+												/* 비밀번호 확인 유효성 검사 */
+												if (pwck == "") {
+													$('.final_pwck_ck').css(
+															'display', 'block');
+													pwckCheck = false;
+												} else {
+													$('.final_pwck_ck').css(
+															'display', 'none');
+													pwckCheck = true;
+												}
 
-					var nickName = $('.nickName_input').val(); // .nickName_input에 입력되는 값
-					var data = {
-						nickName : nickName
-					} // '컨트롤에 넘길 데이터 이름' : '데이터(.nickName_input에 입력되는 값)'
+												/* 닉네임 유효성 검사 */
+												if (nickName == "") {
+													$('.final_nickName_ck')
+															.css('display',
+																	'block');
+													nickNameCheck = false;
+												} else {
+													$('.final_nickName_ck')
+															.css('display',
+																	'none');
+													nickNameCheck = true;
+												}
 
-					$.ajax({
-						type : "post",
-						url : "/user/userNickNameChk",
-						data : data,
-						success : function(result) {
-							// 성공 여부
-							if (result != 'fail') {
-								$('.nickName_input_re_1').css("display",
-										"inline-block");
-								$('.nickName_input_re_2')
-										.css("display", "none");
-								nickNameCheck = true;
-							} else {
-								$('.nickName_input_re_2').css("display",
-										"inline-block");
-								$('.nickName_input_re_1')
-										.css("display", "none");
-								nickNameCheck = false;
-							}
-						} // success 종료
-					}); // ajax 종료
-				});// function 종료
+												/* 이름 유효성 검사 */
+												if (name == "") {
+													$('.final_name_ck').css(
+															'display', 'block');
+													nameCheck = false;
+												} else {
+													$('.final_name_ck').css(
+															'display', 'none');
+													nameCheck = true;
+												}
 
-		/* 인증번호 이메일 전송 */
-		$(".email_check_button").click(function() {
+												/* 이메일 유효성 검사 */
+												if (email == "") {
+													$('.final_email_ck').css(
+															'display', 'block');
+													emailCheck = false;
+												} else {
+													$('.final_email_ck').css(
+															'display', 'none');
+													emailCheck = true;
+												}
 
-			var email = $(".email_input").val(); // 입력한 이메일
-			var checkBox = $(".email_check_input"); // 인증번호 입력란
-			var boxWrap = $(".email_check_input_box"); // 인증번호 입력란 박스
-			var warnMsg = $(".email_input_box_warn"); // 이메일 입력 경고글
+												/* 최종 유효성 검사 */
+												if (idCheck && pwCheck
+														&& pwckCheck
+														&& pwckcorCheck
+														&& nickNameCheck
+														&& nameCheck
+														&& emailCheck
+														&& emailnumCheck) {
 
-			/* 이메일 형식 유효성 검사 */
-			if (emailFormCheck(email)) {
-				warnMsg.html("이메일이 전송 되었습니다. 이메일을 확인해주세요.");
-				warnMsg.css("display", "inline-block");
-			} else {
-				warnMsg.html("올바르지 못한 이메일 형식입니다.");
-				warnMsg.css("display", "inline-block");
-				return false;
-			}
+													$("#join_form").attr(
+															"action",
+															"/user/join");
+													$("#join_form").submit();
 
-			$.ajax({
+												}
 
-				type : "GET",
-				url : "emailCheck?email=" + email,
-				success : function(data) {
+												return false;
 
-					// console.log("data : " + data);
-					checkBox.attr("disabled", false);
-					boxWrap.attr("id", "email_check_input_box_true");
-					code = data;
-				}
-
-			});
-		});
-
-		/* 인증번호 비교 */
-		$(".email_check_input").blur(function() {
-			var inputCode = $(".email_check_input").val(); // 입력코드    
-			var checkResult = $("#email_check_input_box_warn"); // 비교 결과    
-
-			if (inputCode == code) { // 일치할 경우
-				checkResult.html("인증번호가 일치합니다.");
-				checkResult.attr("class", "correct");
-				mailnumCheck = true; // 일치할 경우
-			} else { // 일치하지 않을 경우
-				checkResult.html("인증번호를 다시 확인해주세요.");
-				checkResult.attr("class", "incorrect");
-				mailnumCheck = false; // 일치하지 않을 경우
-			}
-		});
-
-		/* 비밀번호 확인 일치 유효성 검사 */
-
-		$('.pwck_input').on("propertychange change keyup paste input",
-				function() {
-
-					var pw = $('.pw_input').val();
-					var pwck = $('.pwck_input').val();
-					$('.final_pwck_ck').css('display', 'none');
-
-					if (pw == pwck) {
-						$('.pwck_input_re_1').css('display', 'block');
-						$('.pwck_input_re_2').css('display', 'none');
-						pwckcorCheck = true;
-					} else {
-						$('.pwck_input_re_1').css('display', 'none');
-						$('.pwck_input_re_2').css('display', 'block');
-						pwckcorCheck = false;
-					}
-				});
+											});
+						});
 
 		/* 입력 이메일 형식 유효성 검사 */
 		function emailFormCheck(email) {

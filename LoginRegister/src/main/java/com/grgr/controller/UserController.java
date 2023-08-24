@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +35,9 @@ public class UserController {
 	private final UserService userService;
 	@Autowired
 	private JavaMailSender mailSender;
+
+	@Autowired
+	private BCryptPasswordEncoder pwEncoder;
 	private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
 	/* 회원가입 페이지 이동 */
@@ -44,13 +48,18 @@ public class UserController {
 
 	/* 회원가입 */
 	@PostMapping("/join")
-	public String joinPOST(UserVO user, RedirectAttributes rttr) throws Exception {
+	public String joinPOST(UserVO user) throws Exception {
 		logger.info("가입 진행");
 
+		String rawPw = ""; // 인코딩 전 비밀번호
+		String encodePw = ""; // 인코딩 후 비밀번호
+
+		rawPw = user.getUserPw(); // 비밀번호 데이터 얻음
+		encodePw = pwEncoder.encode(rawPw); // 비밀번호 인코딩
+		user.setUserPw(encodePw); // 인코딩된 비밀번호를 user 객체에 다시 저장
+
+		/* 회원가입 쿼리 실행 */
 		userService.userJoin(user);
-
-		rttr.addFlashAttribute("result", "회원가입 성공");
-
 		return "redirect:/main";
 	}
 
@@ -142,18 +151,42 @@ public class UserController {
 	public String loginPOST(HttpServletRequest request, UserVO user, RedirectAttributes rttr) throws Exception {
 
 		HttpSession session = request.getSession();
-		user = userService.userLogin(user);
+		String rawPw = "";
+		String encodePw = "";
 
-		if (user == null) { // 일치하지 않는 아이디, 비밀번호 입력 경우
-			int result = 0;
-			rttr.addFlashAttribute("result", result);
-			return "redirect:/user/login";
+		UserVO user1 = userService.userLogin(user);
+
+		if (user1 != null) { // 일치하는 아이디 존재
+
+			rawPw = user.getUserPw(); // 사용자가 제출한 비밀번호
+			encodePw = user1.getUserPw(); // 데이터베이스에 저장한 인코딩된 비밀번호
+
+			if (true == pwEncoder.matches(rawPw, encodePw)) { // 일치여부 판단
+				user1.setUserPw(""); // 인코딩된 비밀번호 정보 지움
+				session.setAttribute("user", user1); // session에 사용자의 정보 저장
+				return "redirect:/main"; // 메인페이지 이동
+			} else {
+				rttr.addFlashAttribute("result", 0);
+				return "redirect:/user/login"; // 로그인 페이지로 이동
+			}
+
+		} else { // 일지하는 아이디가 존재하지 않을 시 (로그인 실패)
+			rttr.addFlashAttribute("result", 0);
+			return "redirect:/user/login"; // 로그인 페이지로 이동
 		}
 
-		session.setAttribute("user", user); // 일치하는 아이디, 비밀번호 경우 (로그인 성공)
+	}
+
+	/* 메인페이지 로그아웃 */
+	@GetMapping("/logout")
+	public String logoutMainGET(HttpServletRequest request) throws Exception {
+		logger.info("logoutMainGET 메서드 진입");
+
+		HttpSession session = request.getSession();
+
+		session.invalidate();
 
 		return "redirect:/main";
-
 	}
 
 }
